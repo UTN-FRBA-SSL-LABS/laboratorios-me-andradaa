@@ -106,12 +106,12 @@ solo cambiamos una línea (`CC := clang`) y todo el Makefile se actualiza solo.
 
 Las variables más comunes en proyectos C son:
 
-| Variable | Uso convencional |
-|----------|-----------------|
-| `CC` | El compilador de C a usar (normalmente `gcc`) |
+| Variable | Uso convencional                                   |
+| -------- | -------------------------------------------------- |
+| `CC`     | El compilador de C a usar (normalmente `gcc`)      |
 | `CFLAGS` | Flags de compilación (p. ej. `-Wall`, `-g`, `-O2`) |
-| `SRCS` | Lista de archivos fuente `.c` |
-| `OBJS` | Lista de archivos objeto `.o` |
+| `SRCS`   | Lista de archivos fuente `.c`                      |
+| `OBJS`   | Lista de archivos objeto `.o`                      |
 
 ### El target `all`
 
@@ -159,13 +159,14 @@ Cuando tenemos muchos archivos, sería engorroso escribir el nombre de cada uno
 a mano en los comandos. Make provee variables automáticas que se calculan en el
 contexto de cada regla:
 
-| Variable | Significado |
-|----------|-------------|
-| `$@` | El nombre del **target** de esta regla |
-| `$<` | El **primer** prerequisito (primera dependencia) |
-| `$^` | **Todos** los prerequisitos juntos |
+| Variable | Significado                                      |
+| -------- | ------------------------------------------------ |
+| `$@`     | El nombre del **target** de esta regla           |
+| `$<`     | El **primer** prerequisito (primera dependencia) |
+| `$^`     | **Todos** los prerequisitos juntos               |
 
 Ejemplo: si la regla es `suma: main.o operaciones.o`, entonces dentro del comando:
+
 - `$@` vale `suma`
 - `$<` vale `main.o`
 - `$^` vale `main.o operaciones.o`
@@ -219,7 +220,7 @@ Abrí `ejercicio1/Makefile` y completá los cuatro TODOs.
 #### TODO 1 — Definir la variable `CC`
 
 ```makefile
-CC :=
+CC :=gcc
 ```
 
 `CC` es la variable estándar de Make para el **compilador de C**. Por convención
@@ -234,7 +235,7 @@ esta línea y todo el Makefile sigue funcionando sin tocar nada más.
 #### TODO 2 — Definir la variable `CFLAGS`
 
 ```makefile
-CFLAGS :=
+CFLAGS :=-Wall
 ```
 
 `CFLAGS` (_C Flags_) contiene las opciones que le pasamos al compilador.
@@ -251,7 +252,7 @@ impiden la compilación, pero señalan código potencialmente problemático
 
 ```makefile
 $(PROGRAMA): suma.c
-	# Escribí el comando aquí
+	$(CC) $(CFLAGS) suma.c -o $(PROGRAMA)
 ```
 
 Este es el corazón del Makefile: el comando que convierte `suma.c` en el ejecutable.
@@ -274,7 +275,7 @@ gcc generaría un ejecutable llamado `a.out` por defecto.
 
 ```makefile
 clean:
-	# Escribí el comando aquí
+	rm -f $(PROGRAMA)
 ```
 
 Escribí el comando que elimina el ejecutable generado. Usá `rm -f $(PROGRAMA)`.
@@ -286,6 +287,7 @@ no falla.
 ---
 
 **Verificación:**
+
 ```bash
 cd ejercicio1
 make                   # compila suma.c y genera el ejecutable
@@ -304,6 +306,7 @@ usamos Flex, el proceso tiene **dos pasos**: primero Flex genera código C a
 partir del scanner, y luego gcc compila ese código C.
 
 El pipeline es:
+
 ```
 scanner2.l  →[flex]→  lex.yy.c  →[gcc]→  scanner2
 ```
@@ -369,6 +372,7 @@ para que `make` siempre reconstruya todo desde cero cuando se pide.
 ---
 
 **Verificación:**
+
 ```bash
 cd ejercicio2
 make
@@ -388,6 +392,7 @@ Los archivos `parser3.y` y `scanner3.l` ya están completos e implementan una
 calculadora simple. Tu tarea es escribir el Makefile que orquesta todo el proceso.
 
 El pipeline es:
+
 ```
 parser3.y          →[bison -d]→  parser3.tab.c
                                + parser3.tab.h
@@ -469,6 +474,7 @@ Ahora Bison y Flex generaron cuatro archivos intermedios: `parser3.tab.c`,
 ---
 
 **Verificación:**
+
 ```bash
 cd ejercicio3
 make
@@ -491,6 +497,7 @@ luego se re-linkea. Los demás `.o` se reusan tal cual. En proyectos grandes est
 ahorra mucho tiempo.
 
 El pipeline es:
+
 ```
 main.c        →[gcc -c]→  main.o
 operaciones.c →[gcc -c]→  operaciones.o
@@ -574,6 +581,7 @@ Make interpreta esto como: _"para construir **cualquier** `.o`, buscá el `.c`
 del mismo nombre y ejecutá este comando"_.
 
 Desglose del comando:
+
 - `$(CC) $(CFLAGS)` — el compilador con sus flags
 - `-c` — compilar sin linkear (producir `.o`, no ejecutable)
 - `$<` — el primer prerequisito, es decir, el archivo `.c` que hace match
@@ -595,6 +603,7 @@ ese problema indicando explícitamente que son nombres lógicos, no archivos.
 ---
 
 **Verificación:**
+
 ```bash
 cd ejercicio4
 make
@@ -625,7 +634,7 @@ ejecución y la otra, ¿qué hace Make en la segunda ejecución?
 Opciones: `RECOMPILA` / `NO_RECOMPILA` / `DA_ERROR`
 
 ```
-P1=???
+P1=NO_RECOMPILA
 ```
 
 ---
@@ -639,7 +648,7 @@ llamado `clean`?
 Opciones: `SI` / `NO`
 
 ```
-P2=???
+P2=NO
 ```
 
 ---
@@ -652,7 +661,7 @@ P2=???
 Opciones: `PARA_CREAR_ARCHIVOS` / `PARA_EVITAR_CONFLICTOS_DE_NOMBRES` / `PARA_COMPILAR_MAS_RAPIDO`
 
 ```
-P3=???
+P3=PARA_EVITAR_CONFLICTOS_DE_NOMBRES
 ```
 
 ---
